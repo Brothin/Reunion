@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import Typography from '@mui/material/Typography';
@@ -17,6 +17,11 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ min, max, onChange }) => {
     onChange(newValues);
   };
 
+  const marks = {
+    [min]: min,
+    [max]: max,
+  };
+
   return (
     <div className="text-center">
       <Slider
@@ -25,6 +30,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ min, max, onChange }) => {
         max={max}
         defaultValue={[min, max]}
         onChange={handleSliderChange}
+        marks={marks}
       />
       <Typography className='flex justify-center' variant="caption" display="block" gutterBottom>
         Min: {Array.isArray(values) ? values[0] : values}, Max: {Array.isArray(values) ? values[1] : values}
@@ -32,6 +38,5 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ min, max, onChange }) => {
     </div>
   );
 };
-
 
 export default RangeSlider;

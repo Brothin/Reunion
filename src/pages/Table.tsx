@@ -145,23 +145,20 @@ const Table = () => {
     setFacetedValues(uniqueValues)
   };
 
-  const minSalary = useMemo(
-    () => data.reduce((acc, curr) => Math.min(acc, curr.salary), data[0] ? data[0].salary : 0),
-    [data]
-  );
-  const maxSalary = useMemo(
-    () => data.reduce((acc, curr) => Math.max(acc, curr.salary),0),
-    [],
-  );
+  const [initialMinMaxValues, setInitialMinMaxValues] = useState<number[]>([]);
 
-  const [initialMinMaxValues, setInitialMinMaxValues] = useState([minSalary, maxSalary]); 
-         
-  useEffect(() => {
-    setInitialMinMaxValues([minSalary, maxSalary]);
-  }, [setInitialMinMaxValues]);
-
-  const handleFilterChange = (e:any, id:any) => {
-    
+    useEffect(() => {
+        const uniqueValues = Array.from(
+        table.getColumn("salary").getFacetedUniqueValues().keys()
+        );
+        const minSalary = Math.min(...uniqueValues);
+        const maxSalary = Math.max(...uniqueValues);
+        setInitialMinMaxValues([minSalary, maxSalary]);
+        console.log(initialMinMaxValues[0]);
+    }, []);
+        
+    const handleFilterChange = (e:any, id:any) => {
+            
     const updatedValues = [...filterValues];
 
     const existingValueIndex = updatedValues.findIndex(
@@ -257,7 +254,7 @@ const Table = () => {
   return (
     <div className="flex flex-col items-center">
       <MaterialReactTable table={table}/>
-      {showFilters && (
+      {showFilters && initialMinMaxValues.length > 0 && (
         <div className="mt-4 p-4 border rounded shadow-md">
           {columns.map((column) => (
             <div key={column.accessorKey} className="mb-2 flex items-center">
@@ -271,11 +268,11 @@ const Table = () => {
                 onChange={(e) => handleFilterChange(e, column.id)}
             />)
             }
-            {column.accessorKey === 'salary' && (
+            {column.accessorKey === 'salary' && initialMinMaxValues.length > 0 && (
                 <div className='w-[397px] mx-5'>
-                <RangeSlider min={initialMinMaxValues[0]} max={initialMinMaxValues[1]} onChange={(e) => handleFilterChange(e, column.id)} />
+                  <RangeSlider min={initialMinMaxValues[0]} max={initialMinMaxValues[1]} onChange={(e) => handleFilterChange(e, column.id)} />
                 </div>
-            )}
+              )}
             {column.accessorKey !== 'salary' && (
             <div>
                   <select
@@ -292,27 +289,27 @@ const Table = () => {
                     ))}
                   </select>
             </div>)}
-              <button
+            <button 
                 className="ml-2 p-2 bg-blue-500 text-white rounded"
                 onClick={(e) => handleSortClick(column.id, !sorting[currentButton]?.desc)}
               >
                 Sort
               </button>
-              <button
+            <button
                 className="ml-2 p-2 bg-blue-500 text-white rounded"
                 onClick={(e) => handleColumnClick(column.id, !columnVisibility[column.id])
                 }
               >
                 View / Hide
               </button>
-              <button
+            <button
                 className="ml-2 p-2 bg-blue-500 text-white rounded"
                 onClick={(e) => handleColumnOrderClick(column.id, "left")
                 }
               >
                 Left
               </button>
-              <button
+            <button
                 className="ml-2 p-2 bg-blue-500 text-white rounded"
                 onClick={(e) => handleColumnOrderClick(column.id, "right")
                 }
